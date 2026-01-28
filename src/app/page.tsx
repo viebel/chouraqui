@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { ChapterVerseSelector } from "./components/ChapterVerseSelector";
 import { HistoryNav } from "./components/HistoryNav";
-import { ParallelVerses } from "./components/ParallelVerses";
+import { InfiniteParallelVerses } from "./components/InfiniteParallelVerses";
 import {
   getBook,
   getBooks,
@@ -181,12 +181,14 @@ export default async function Home({ searchParams }: HomeProps) {
             {verses.length === 0 ? (
               <p className="text-zinc-700">Aucun verset trouvé pour ce chapitre.</p>
             ) : (
-              <ParallelVerses
-                frenchVerses={verses}
-                hebrewVerses={hebrewVerses}
-                bookName={book?.longName ?? "Livre"}
-                chapter={chapter}
+              <InfiniteParallelVerses
+                bookNumber={book?.bookNumber ?? fallbackBook}
+                initialChapter={chapter}
+                initialFrenchVerses={verses}
+                initialHebrewVerses={hebrewVerses}
+                maxChapter={maxChapter ?? 1}
                 selectedVerse={selectedVerse}
+                bookName={book?.longName ?? "Livre"}
                 hasHebrew={hasHebrew}
               />
             )}
