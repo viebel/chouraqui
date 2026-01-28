@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useChapter } from "./ChapterContext";
 
 type FrenchVerse = {
   verse: number;
@@ -80,6 +81,7 @@ export function InfiniteParallelVerses({
   bookName,
   hasHebrew,
 }: Props) {
+  const { setCurrentChapter } = useChapter();
   const [chapters, setChapters] = useState<ChapterData[]>([
     { chapter: initialChapter, frenchVerses: initialFrenchVerses, hebrewVerses: initialHebrewVerses },
   ]);
@@ -88,6 +90,48 @@ export function InfiniteParallelVerses({
   const nextTriggerRef = useRef<HTMLDivElement>(null);
   const prevTriggerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const chapterRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  // Track visible chapter using scroll event
+  useEffect(() => {
+    const handleScroll = () => {
+      const viewportTop = window.scrollY + 350; // Account for sticky header
+      let closestChapter = initialChapter;
+      let closestDistance = Infinity;
+
+      chapterRefs.current.forEach((el, chapter) => {
+        const rect = el.getBoundingClientRect();
+        const elementTop = rect.top + window.scrollY;
+        const elementBottom = elementTop + rect.height;
+        
+        // Check if this chapter is visible and closest to the top
+        if (elementBottom > viewportTop && elementTop < viewportTop + window.innerHeight) {
+          const distance = Math.abs(viewportTop - elementTop);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestChapter = chapter;
+          }
+        }
+      });
+
+      setCurrentChapter(closestChapter);
+    };
+
+    // Initial call
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [chapters, setCurrentChapter, initialChapter]);
+
+  // Update refs when chapters change
+  const setChapterRef = useCallback((chapter: number, el: HTMLDivElement | null) => {
+    if (el) {
+      chapterRefs.current.set(chapter, el);
+    } else {
+      chapterRefs.current.delete(chapter);
+    }
+  }, []);
 
   const firstChapter = chapters[0]?.chapter ?? initialChapter;
   const lastChapter = chapters[chapters.length - 1]?.chapter ?? initialChapter;
@@ -209,7 +253,12 @@ export function InfiniteParallelVerses({
         const isInitialChapter = chapterData.chapter === initialChapter;
 
         return (
-          <div key={chapterData.chapter} className="space-y-4">
+          <div
+            key={chapterData.chapter}
+            ref={(el) => setChapterRef(chapterData.chapter, el)}
+            data-chapter={chapterData.chapter}
+            className="space-y-4"
+          >
             {/* Chapter separator (not for first displayed chapter) */}
             {chapterIndex > 0 && (
               <div className="flex items-center gap-4 py-4">

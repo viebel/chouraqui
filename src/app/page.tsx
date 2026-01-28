@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { ChapterVerseSelector } from "./components/ChapterVerseSelector";
 import { HistoryNav } from "./components/HistoryNav";
+import { ChapterProvider } from "./components/ChapterContext";
+import { ContentLabelsHeader } from "./components/ContentLabelsHeader";
 import { InfiniteParallelVerses } from "./components/InfiniteParallelVerses";
 import {
   getBook,
@@ -86,6 +88,7 @@ export default async function Home({ searchParams }: HomeProps) {
     maxChapter && chapter < maxChapter ? chapter + 1 : null;
 
   return (
+    <ChapterProvider initialChapter={chapter}>
     <div className="min-h-screen bg-[#fdfaf4] text-zinc-900">
       <div className="sticky top-0 z-20 bg-[#fdfaf4] backdrop-blur-sm">
         <div className="border-b border-amber-200/70">
@@ -153,30 +156,18 @@ export default async function Home({ searchParams }: HomeProps) {
 
         </div>
         </div>
-        {/* Content labels - visually connected to verses below */}
+        {/* Content labels - sticky with the rest of the header */}
         <div className="mx-auto w-full max-w-6xl px-6 sm:px-10">
-          <div className={`grid gap-6 rounded-t-2xl border border-amber-200/80 border-b-0 bg-white/85 p-4 ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
-            {hasHebrew && (
-              <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
-                <span className="text-base font-semibold text-amber-950">{book?.longName ?? "Livre"} {chapter}</span>
-                <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
-                  עברית
-                </span>
-              </div>
-            )}
-            <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
-              <span className="text-base font-semibold text-amber-950">{book?.longName ?? "Livre"} {chapter}</span>
-              <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
-                Traduction André Chouraqui
-              </span>
-            </div>
-          </div>
+          <ContentLabelsHeader
+            bookName={book?.longName ?? "Livre"}
+            hasHebrew={hasHebrew}
+          />
         </div>
       </div>
 
+      {/* Verses */}
       <main className="mx-auto flex w-full max-w-6xl flex-col px-6 sm:px-10 -mt-[2px]">
         <article className="rounded-t-none rounded-b-2xl border border-amber-200/80 border-t-0 bg-white/85 shadow-sm backdrop-blur mb-6">
-          {/* Parallel verses */}
           <div className="p-6 pt-4">
             {verses.length === 0 ? (
               <p className="text-zinc-700">Aucun verset trouvé pour ce chapitre.</p>
@@ -196,5 +187,6 @@ export default async function Home({ searchParams }: HomeProps) {
         </article>
       </main>
     </div>
+    </ChapterProvider>
   );
 }
