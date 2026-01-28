@@ -96,10 +96,10 @@ export function ParallelVerses({
               {/* Hebrew column */}
               {hasHebrew && (
                 <div className="flex-1 text-right" dir="rtl">
-                  <span className="ml-2 text-sm font-semibold text-amber-800/70">
+                  <span className="ml-2 text-base font-semibold text-amber-800/70">
                     {toHebrewNumeral(verse.verse)}
                   </span>
-                  <span className="font-serif text-xl leading-8 text-zinc-700">
+                  <span className="font-[family-name:var(--font-hebrew)] text-2xl leading-10 text-zinc-700">
                     {hebrewText ?? "—"}
                   </span>
                 </div>
@@ -111,7 +111,7 @@ export function ParallelVerses({
                   {verse.verse}
                 </span>
                 <span
-                  className="text-xl leading-8 text-zinc-700"
+                  className="text-lg leading-10 text-zinc-700"
                   dangerouslySetInnerHTML={{ __html: formatText(verse.text) }}
                 />
               </div>
