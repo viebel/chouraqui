@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HistoryNav } from "./components/HistoryNav";
 import {
   getBook,
   getBooks,
@@ -13,6 +14,7 @@ type SearchParams = {
   book?: string;
   chapter?: string;
   group?: string;
+  verse?: string;
 };
 
 type HomeProps = {
@@ -73,6 +75,7 @@ export default async function Home({ searchParams }: HomeProps) {
   );
 
   const verses = book ? getVerses(book.bookNumber, chapter) : [];
+  const selectedVerse = params.verse ? Number(params.verse) : 1;
   const prevChapter = chapter > 1 ? chapter - 1 : null;
   const nextChapter =
     maxChapter && chapter < maxChapter ? chapter + 1 : null;
@@ -85,10 +88,12 @@ export default async function Home({ searchParams }: HomeProps) {
           <span>Edition numerique</span>
         </div>
       </div>
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 sm:px-10 sm:py-16">
-        <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-6 shadow-sm">
+      <div className="sticky top-0 z-10 bg-[#fdfaf4]/95 backdrop-blur-sm pb-4 pt-4 border-b border-amber-200/50">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 sm:px-10">
+          <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-center gap-2">
+              <HistoryNav />
               {groupBooks.map((group) => {
                 const isActive = group.key === activeGroup?.key;
                 const groupBook = group.items[0];
@@ -126,37 +131,68 @@ export default async function Home({ searchParams }: HomeProps) {
               })}
             </div>
           </div>
-        </section>
+          </section>
 
-        <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-6 shadow-sm">
-          <div className="flex flex-col gap-4">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
-              Chapitres
-            </p>
-            <div className="grid grid-cols-10 gap-2 text-center">
-              {maxChapter
-                ? Array.from({ length: maxChapter }, (_, index) => {
-                    const chapterNumber = index + 1;
-                    const isActive = chapterNumber === chapter;
+          <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
+            <div className="flex flex-col gap-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
+                Chapitres
+              </p>
+              <div className="grid grid-cols-10 gap-2 text-center">
+                {maxChapter
+                  ? Array.from({ length: maxChapter }, (_, index) => {
+                      const chapterNumber = index + 1;
+                      const isActive = chapterNumber === chapter;
+                      return (
+                        <Link
+                          key={chapterNumber}
+                          href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${chapterNumber}`}
+                          className={`flex h-8 items-center justify-center rounded-md text-sm font-semibold transition ${
+                            isActive
+                              ? "bg-zinc-800 text-white"
+                              : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                          }`}
+                        >
+                          {chapterNumber}
+                        </Link>
+                      );
+                    })
+                  : null}
+              </div>
+            </div>
+          </section>
+
+          {verses.length > 0 && (
+            <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
+              <div className="flex flex-col gap-3">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
+                  Versets
+                </p>
+                <div className="grid grid-cols-10 gap-2 text-center">
+                  {verses.map((verse) => {
+                    const isActive = verse.verse === selectedVerse;
                     return (
                       <Link
-                        key={chapterNumber}
-                        href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${chapterNumber}`}
-                        className={`flex h-9 items-center justify-center rounded-md text-sm font-semibold transition ${
+                        key={verse.verse}
+                        href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${chapter}&verse=${verse.verse}#verset-${verse.verse}`}
+                        className={`flex h-8 items-center justify-center rounded-md text-sm font-semibold transition ${
                           isActive
-                            ? "bg-zinc-800 text-white"
-                            : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                            ? "bg-amber-700 text-white"
+                            : "bg-amber-100 text-amber-900 hover:bg-amber-200"
                         }`}
                       >
-                        {chapterNumber}
+                        {verse.verse}
                       </Link>
                     );
-                  })
-                : null}
-            </div>
-          </div>
-        </section>
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
 
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 sm:px-10 sm:py-16">
         <section className="grid gap-6 md:grid-cols-2">
           <article className="rounded-2xl border border-amber-200/80 bg-white/85 p-6 shadow-sm backdrop-blur">
             <div className="mb-4 flex items-center justify-between text-sm font-semibold text-amber-900/70">
@@ -192,7 +228,15 @@ export default async function Home({ searchParams }: HomeProps) {
                   <p>Aucun verset trouve pour ce chapitre.</p>
                 ) : (
                   verses.map((verse) => (
-                    <p key={verse.verse}>
+                    <p
+                      key={verse.verse}
+                      id={`verset-${verse.verse}`}
+                      className={`scroll-mt-[400px] rounded-lg px-2 py-1 transition-colors ${
+                        verse.verse === selectedVerse
+                          ? "bg-amber-100/80"
+                          : ""
+                      }`}
+                    >
                       <span className="mr-2 text-xs font-semibold text-amber-800/70">
                         {verse.verse}
                       </span>
@@ -203,42 +247,6 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
             </div>
           </article>
-        </section>
-
-        <section className="flex flex-wrap items-center gap-4 text-sm text-zinc-700">
-          <span className="font-semibold text-amber-900/80">
-            Navigation rapide
-          </span>
-          <div className="flex items-center gap-3">
-            {prevChapter ? (
-              <Link
-                className="rounded-full border border-amber-200/80 px-4 py-2 text-amber-900 hover:border-transparent hover:bg-amber-100/60"
-                href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${prevChapter}`}
-              >
-                Chapitre précédent
-              </Link>
-            ) : null}
-            {nextChapter ? (
-              <Link
-                className="rounded-full border border-amber-200/80 px-4 py-2 text-amber-900 hover:border-transparent hover:bg-amber-100/60"
-                href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${nextChapter}`}
-              >
-                Chapitre suivant
-              </Link>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-dashed border-amber-200/60 bg-white/75 p-6 text-sm text-zinc-700">
-          <p className="font-semibold text-amber-900/80">
-            Prochaines etapes
-          </p>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            <li>Importer les données de versets hébreux et français.</li>
-            <li>Ajouter la navigation par livre, chapitre et verset.</li>
-            <li>Synchroniser les versets hébreux et français ligne par ligne.</li>
-            <li>Préparer le déploiement sur Vercel.</li>
-          </ul>
         </section>
       </main>
     </div>
