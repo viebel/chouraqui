@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chouraqui Bible",
+  title: "La Bible de Chouraqui",
   description:
-    "Hebrew and French Bible display with Andre Chouraqui translations.",
+    "Affichage de la Bible en hébreu et en français avec les traductions d'André Chouraqui.",
 };
 
 export default function RootLayout({

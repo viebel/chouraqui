@@ -43,7 +43,7 @@ export default async function Home({ searchParams }: HomeProps) {
     },
     {
       key: "prophetes",
-      label: "Prophetes",
+      label: "Prophètes",
       items: books.filter((bookItem) => prophetes.has(bookItem.bookNumber)),
     },
     {
@@ -86,19 +86,6 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       </div>
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 sm:px-10 sm:py-16">
-        <header className="flex flex-col gap-4">
-          <p className="text-sm font-semibold tracking-[0.3em] text-amber-800/80">
-            TRADUCTION D’ANDRE CHOURAQUI
-          </p>
-          <h1 className="text-3xl font-semibold leading-tight text-amber-950 sm:text-4xl">
-            Lecture du texte biblique en vis-a-vis
-          </h1>
-          <p className="max-w-3xl text-base leading-7 text-zinc-700">
-            Parcourez les livres et chapitres pour afficher la traduction
-            francaise et preparer l'integration de la version hebraique.
-          </p>
-        </header>
-
         <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-6 shadow-sm">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-center gap-2">
@@ -138,23 +125,15 @@ export default async function Home({ searchParams }: HomeProps) {
                 );
               })}
             </div>
-            <div className="text-center text-xs text-zinc-500">
-              {book?.longName ?? "Livre"} {chapter}
-            </div>
           </div>
         </section>
 
         <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-6 shadow-sm">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
-                Chapitres
-              </p>
-              <span className="text-xs text-zinc-500">
-                {book?.longName ?? "Livre"} {chapter}
-              </span>
-            </div>
-            <div className="grid grid-cols-8 gap-2 text-center sm:grid-cols-12 md:grid-cols-16">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
+              Chapitres
+            </p>
+            <div className="grid grid-cols-10 gap-2 text-center">
               {maxChapter
                 ? Array.from({ length: maxChapter }, (_, index) => {
                     const chapterNumber = index + 1;
