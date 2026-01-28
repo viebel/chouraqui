@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { HistoryNav } from "./components/HistoryNav";
-import { InfiniteVerses } from "./components/InfiniteVerses";
+import { ParallelVerses } from "./components/ParallelVerses";
 import { VerseSelector } from "./components/VerseSelector";
 import {
   getBook,
@@ -9,6 +9,7 @@ import {
   getMaxChapter,
   getVerses,
 } from "@/lib/chouraqui-db";
+import { getHebrewVerses, hasHebrewText } from "@/lib/tanakh-db";
 
 export const runtime = "nodejs";
 
@@ -77,6 +78,8 @@ export default async function Home({ searchParams }: HomeProps) {
   );
 
   const verses = book ? getVerses(book.bookNumber, chapter) : [];
+  const hebrewVerses = book ? getHebrewVerses(book.bookNumber, chapter) : [];
+  const hasHebrew = book ? hasHebrewText(book.bookNumber) : false;
   const selectedVerse = params.verse ? Number(params.verse) : 1;
   const prevChapter = chapter > 1 ? chapter - 1 : null;
   const nextChapter =
@@ -183,46 +186,39 @@ export default async function Home({ searchParams }: HomeProps) {
       </div>
 
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 sm:px-10 sm:py-16">
-        <section className="grid gap-6 md:grid-cols-2">
-          <article className="rounded-2xl border border-amber-200/80 bg-white/85 p-6 shadow-sm backdrop-blur">
-            <div className="mb-4 flex items-center justify-between text-sm font-semibold text-amber-900/70">
-              <span>עברית</span>
-              <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
-                Texte source
-              </span>
-            </div>
-            <div className="space-y-4 text-right" dir="rtl">
-              <p className="text-lg font-semibold text-amber-950">
-                {book?.longName ?? "Livre"} {chapter}
-              </p>
-              <p className="text-sm leading-6 text-zinc-600">
-                Le texte hebreu n'est pas present dans la base actuelle. Ajoutez
-                une source hebraique pour l'affichage parallele.
-              </p>
-            </div>
-          </article>
-
-          <article className="rounded-2xl border border-amber-200/80 bg-white/85 p-6 shadow-sm backdrop-blur">
-            <div className="mb-4 flex items-center justify-between text-sm font-semibold text-amber-900/70">
-              <span>Francais</span>
-              <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
-                Traduction Andre Chouraqui
-              </span>
-            </div>
-            {verses.length === 0 ? (
-              <p className="text-zinc-700">Aucun verset trouve pour ce chapitre.</p>
-            ) : (
-              <InfiniteVerses
-                bookNumber={book?.bookNumber ?? fallbackBook}
-                initialChapter={chapter}
-                initialVerses={verses}
-                maxChapter={maxChapter ?? chapter}
-                selectedVerse={selectedVerse}
-                bookName={book?.longName ?? "Livre"}
-              />
+        <article className="rounded-2xl border border-amber-200/80 bg-white/85 p-6 shadow-sm backdrop-blur">
+          {/* Header with labels */}
+          <div className={`mb-6 grid gap-4 ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
+            {hasHebrew && (
+              <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
+                <span>עברית</span>
+                <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
+                  Texte source
+                </span>
+              </div>
             )}
-          </article>
-        </section>
+            <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
+              <span>Français</span>
+              <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
+                Traduction André Chouraqui
+              </span>
+            </div>
+          </div>
+
+          {/* Parallel verses */}
+          {verses.length === 0 ? (
+            <p className="text-zinc-700">Aucun verset trouvé pour ce chapitre.</p>
+          ) : (
+            <ParallelVerses
+              frenchVerses={verses}
+              hebrewVerses={hebrewVerses}
+              bookName={book?.longName ?? "Livre"}
+              chapter={chapter}
+              selectedVerse={selectedVerse}
+              hasHebrew={hasHebrew}
+            />
+          )}
+        </article>
       </main>
     </div>
   );
