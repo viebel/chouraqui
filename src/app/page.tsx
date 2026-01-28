@@ -10,6 +10,7 @@ import {
   getBooks,
   getMaxChapter,
   getVerses,
+  getCommonFrenchName,
 } from "@/lib/chouraqui-db";
 import { getHebrewVerses, hasHebrewText, getHebrewBookName } from "@/lib/tanakh-db";
 
@@ -83,6 +84,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const hebrewVerses = book ? getHebrewVerses(book.bookNumber, chapter) : [];
   const hasHebrew = book ? hasHebrewText(book.bookNumber) : false;
   const hebrewBookName = book ? getHebrewBookName(book.bookNumber) : null;
+  const commonFrenchName = book ? getCommonFrenchName(book.bookNumber) : null;
   const selectedVerse = params.verse ? Number(params.verse) : 1;
   const prevChapter = chapter > 1 ? chapter - 1 : null;
   const nextChapter =
@@ -124,6 +126,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <div className="flex flex-wrap items-center justify-center gap-2 min-h-[76px]">
               {activeGroup?.items.map((item) => {
                 const isActive = item.bookNumber === book?.bookNumber;
+                const displayName = getCommonFrenchName(item.bookNumber) ?? item.longName;
                 return (
                   <Link
                     key={item.bookNumber}
@@ -134,7 +137,7 @@ export default async function Home({ searchParams }: HomeProps) {
                         : "border-transparent text-amber-800/70 hover:bg-amber-50 hover:text-amber-900"
                     }`}
                   >
-                    {item.longName}
+                    {displayName}
                   </Link>
                 );
               })}
@@ -162,6 +165,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <ContentLabelsHeader
             bookName={book?.longName ?? "Livre"}
             hebrewBookName={hebrewBookName}
+            commonFrenchName={commonFrenchName}
             hasHebrew={hasHebrew}
           />
         </div>

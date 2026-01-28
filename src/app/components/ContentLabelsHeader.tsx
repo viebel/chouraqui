@@ -41,24 +41,28 @@ function toHebrewNumeral(num: number): string {
 type Props = {
   bookName: string;
   hebrewBookName: string | null;
+  commonFrenchName: string | null;
   hasHebrew: boolean;
 };
 
-export function ContentLabelsHeader({ bookName, hebrewBookName, hasHebrew }: Props) {
+export function ContentLabelsHeader({ bookName, hebrewBookName, commonFrenchName, hasHebrew }: Props) {
   const { currentChapter } = useChapter();
+  const frenchDisplayName = commonFrenchName 
+    ? `${commonFrenchName} (${bookName})`
+    : bookName;
 
   return (
     <div className="rounded-t-2xl border border-amber-200/80 border-b-0 bg-white px-6 py-4">
       <div className={`flex items-baseline p-3 ${hasHebrew ? "flex-row gap-6" : "flex-col"}`}>
         {hasHebrew && (
           <div className="flex-1 text-right" dir="rtl">
-            <span className="text-2xl font-semibold text-amber-950 font-[family-name:var(--font-hebrew)]">
-              {hebrewBookName ?? bookName} {toHebrewNumeral(currentChapter)}
+            <span className="text-2xl text-amber-800/70 font-[family-name:var(--font-hebrew)]">
+              {hebrewBookName ?? bookName} פרק {toHebrewNumeral(currentChapter)}
             </span>
           </div>
         )}
         <div className="flex-1 text-left">
-          <span className="text-lg font-semibold text-amber-950">{bookName} {currentChapter}</span>
+          <span className="text-lg text-amber-800/70">{frenchDisplayName} Chapitre {currentChapter}</span>
         </div>
       </div>
     </div>
