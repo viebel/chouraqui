@@ -11,7 +11,7 @@ import {
   getMaxChapter,
   getVerses,
 } from "@/lib/chouraqui-db";
-import { getHebrewVerses, hasHebrewText } from "@/lib/tanakh-db";
+import { getHebrewVerses, hasHebrewText, getHebrewBookName } from "@/lib/tanakh-db";
 
 export const runtime = "nodejs";
 
@@ -82,6 +82,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const verses = book ? getVerses(book.bookNumber, chapter) : [];
   const hebrewVerses = book ? getHebrewVerses(book.bookNumber, chapter) : [];
   const hasHebrew = book ? hasHebrewText(book.bookNumber) : false;
+  const hebrewBookName = book ? getHebrewBookName(book.bookNumber) : null;
   const selectedVerse = params.verse ? Number(params.verse) : 1;
   const prevChapter = chapter > 1 ? chapter - 1 : null;
   const nextChapter =
@@ -160,6 +161,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="mx-auto w-full max-w-6xl px-6 sm:px-10">
           <ContentLabelsHeader
             bookName={book?.longName ?? "Livre"}
+            hebrewBookName={hebrewBookName}
             hasHebrew={hasHebrew}
           />
         </div>
