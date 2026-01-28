@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { HistoryNav } from "./components/HistoryNav";
+import { InfiniteVerses } from "./components/InfiniteVerses";
+import { VerseSelector } from "./components/VerseSelector";
 import {
   getBook,
   getBooks,
@@ -168,24 +170,12 @@ export default async function Home({ searchParams }: HomeProps) {
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
                   Versets
                 </p>
-                <div className="grid grid-cols-10 gap-2 text-center">
-                  {verses.map((verse) => {
-                    const isActive = verse.verse === selectedVerse;
-                    return (
-                      <Link
-                        key={verse.verse}
-                        href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${chapter}&verse=${verse.verse}#verset-${verse.verse}`}
-                        className={`flex h-8 items-center justify-center rounded-md text-sm font-semibold transition ${
-                          isActive
-                            ? "bg-amber-700 text-white"
-                            : "bg-amber-100 text-amber-900 hover:bg-amber-200"
-                        }`}
-                      >
-                        {verse.verse}
-                      </Link>
-                    );
-                  })}
-                </div>
+                <VerseSelector
+                  verses={verses}
+                  selectedVerse={selectedVerse}
+                  bookNumber={book?.bookNumber ?? fallbackBook}
+                  chapter={chapter}
+                />
               </div>
             </section>
           )}
@@ -219,33 +209,18 @@ export default async function Home({ searchParams }: HomeProps) {
                 Traduction Andre Chouraqui
               </span>
             </div>
-            <div className="space-y-4">
-              <p className="text-lg font-semibold text-amber-950">
-                {book?.longName ?? "Livre"} {chapter}
-              </p>
-              <div className="space-y-3 text-base leading-7 text-zinc-700">
-                {verses.length === 0 ? (
-                  <p>Aucun verset trouve pour ce chapitre.</p>
-                ) : (
-                  verses.map((verse) => (
-                    <p
-                      key={verse.verse}
-                      id={`verset-${verse.verse}`}
-                      className={`scroll-mt-[400px] rounded-lg px-2 py-1 transition-colors ${
-                        verse.verse === selectedVerse
-                          ? "bg-amber-100/80"
-                          : ""
-                      }`}
-                    >
-                      <span className="mr-2 text-xs font-semibold text-amber-800/70">
-                        {verse.verse}
-                      </span>
-                      {verse.text}
-                    </p>
-                  ))
-                )}
-              </div>
-            </div>
+            {verses.length === 0 ? (
+              <p className="text-zinc-700">Aucun verset trouve pour ce chapitre.</p>
+            ) : (
+              <InfiniteVerses
+                bookNumber={book?.bookNumber ?? fallbackBook}
+                initialChapter={chapter}
+                initialVerses={verses}
+                maxChapter={maxChapter ?? chapter}
+                selectedVerse={selectedVerse}
+                bookName={book?.longName ?? "Livre"}
+              />
+            )}
           </article>
         </section>
       </main>
