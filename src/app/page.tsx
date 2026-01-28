@@ -98,8 +98,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 sm:px-10">
           <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <HistoryNav />
+            <div className="flex flex-wrap items-center justify-center gap-3">
               {groupBooks.map((group) => {
                 const isActive = group.key === activeGroup?.key;
                 const groupBook = group.items[0];
@@ -107,10 +106,10 @@ export default async function Home({ searchParams }: HomeProps) {
                   <Link
                     key={group.key}
                     href={`/?group=${group.key}&book=${groupBook?.bookNumber ?? fallbackBook}&chapter=1`}
-                    className={`rounded-md px-6 py-2 text-sm font-semibold ${
+                    className={`rounded-full border-2 px-5 py-2 text-sm font-semibold transition-all ${
                       isActive
-                        ? "bg-zinc-800 text-white"
-                        : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                        ? "border-amber-400 bg-amber-50 text-amber-900"
+                        : "border-transparent bg-gradient-to-b from-white to-amber-50/50 text-amber-800/70 hover:border-amber-200 hover:text-amber-900"
                     }`}
                   >
                     {group.label}
@@ -118,17 +117,17 @@ export default async function Home({ searchParams }: HomeProps) {
                 );
               })}
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2 min-h-[76px]">
               {activeGroup?.items.map((item) => {
                 const isActive = item.bookNumber === book?.bookNumber;
                 return (
                   <Link
                     key={item.bookNumber}
                     href={`/?group=${activeGroup?.key}&book=${item.bookNumber}&chapter=1`}
-                    className={`rounded-md px-4 py-2 text-sm font-semibold ${
+                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-all ${
                       isActive
-                        ? "bg-zinc-800 text-white"
-                        : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                        ? "border-amber-400 bg-amber-50 text-amber-900"
+                        : "border-transparent text-amber-800/70 hover:bg-amber-50 hover:text-amber-900"
                     }`}
                   >
                     {item.longName}
@@ -140,22 +139,23 @@ export default async function Home({ searchParams }: HomeProps) {
           </section>
 
           <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
-            <ChapterVerseSelector
-              maxChapter={maxChapter}
-              currentChapter={chapter}
-              verses={verses}
-              selectedVerse={selectedVerse}
-              bookNumber={book?.bookNumber ?? fallbackBook}
-            />
+            <div className="flex items-center gap-4">
+              <HistoryNav />
+              <ChapterVerseSelector
+                maxChapter={maxChapter}
+                currentChapter={chapter}
+                verses={verses}
+                selectedVerse={selectedVerse}
+                bookNumber={book?.bookNumber ?? fallbackBook}
+              />
+            </div>
           </section>
-        </div>
-        </div>
-      </div>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col px-6 py-3 sm:px-10 sm:py-4">
-        <article className="rounded-2xl border border-amber-200/80 bg-white/85 shadow-sm backdrop-blur">
-          {/* Sticky header with labels */}
-          <div className={`sticky top-[320px] z-[15] grid gap-6 rounded-t-2xl bg-white border-b border-amber-200/50 p-4 shadow-sm ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
+        </div>
+        </div>
+        {/* Content labels - visually connected to verses below */}
+        <div className="mx-auto w-full max-w-6xl px-6 sm:px-10">
+          <div className={`grid gap-6 rounded-t-2xl border border-amber-200/80 border-b-0 bg-white/85 p-4 ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
             {hasHebrew && (
               <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
                 <span className="text-base font-semibold text-amber-950">{book?.longName ?? "Livre"} {chapter}</span>
@@ -171,7 +171,11 @@ export default async function Home({ searchParams }: HomeProps) {
               </span>
             </div>
           </div>
+        </div>
+      </div>
 
+      <main className="mx-auto flex w-full max-w-6xl flex-col px-6 sm:px-10 -mt-[2px]">
+        <article className="rounded-t-none rounded-b-2xl border border-amber-200/80 border-t-0 bg-white/85 shadow-sm backdrop-blur mb-6">
           {/* Parallel verses */}
           <div className="p-6 pt-4">
             {verses.length === 0 ? (
