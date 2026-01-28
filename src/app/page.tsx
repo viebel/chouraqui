@@ -9,20 +9,62 @@ import {
 
 export const runtime = "nodejs";
 
-type HomeProps = {
-  searchParams?: {
-    book?: string;
-    chapter?: string;
-  };
+type SearchParams = {
+  book?: string;
+  chapter?: string;
+  group?: string;
 };
 
-export default function Home({ searchParams }: HomeProps) {
+type HomeProps = {
+  searchParams?: Promise<SearchParams>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = (await searchParams) ?? {};
   const books = getBooks();
   const fallbackBook = books[0]?.bookNumber ?? 10;
-  const requestedBook = Number(searchParams?.book ?? fallbackBook);
-  const requestedChapter = Number(searchParams?.chapter ?? 1);
+  const requestedBook = Number(params.book ?? fallbackBook);
+  const requestedChapter = Number(params.chapter ?? 1);
+
+  const pentateuque = new Set([10, 20, 30, 40, 50]);
+  const prophetes = new Set([
+    60, 70, 90, 100, 110, 120, 290, 300, 330, 350, 360, 370, 380, 390, 400,
+    410, 420, 430, 440, 450, 460,
+  ]);
+  const hagiographes = new Set([
+    80, 130, 140, 150, 160, 190, 220, 230, 240, 250, 260, 310, 340,
+  ]);
+
+  const groupBooks = [
+    {
+      key: "pentateuque",
+      label: "Pentateuque",
+      items: books.filter((bookItem) => pentateuque.has(bookItem.bookNumber)),
+    },
+    {
+      key: "prophetes",
+      label: "Prophetes",
+      items: books.filter((bookItem) => prophetes.has(bookItem.bookNumber)),
+    },
+    {
+      key: "hagiographes",
+      label: "Hagiographes",
+      items: books.filter((bookItem) => hagiographes.has(bookItem.bookNumber)),
+    },
+  ];
 
   const book = getBook(requestedBook) ?? getBook(fallbackBook);
+  const selectedGroupKey =
+    groupBooks.find((group) =>
+      group.items.some((item) => item.bookNumber === book?.bookNumber)
+    )?.key ?? groupBooks[0]?.key;
+  const activeGroupKey = groupBooks.some(
+    (group) => group.key === params.group
+  )
+    ? params.group
+    : selectedGroupKey;
+  const activeGroup =
+    groupBooks.find((group) => group.key === activeGroupKey) ?? groupBooks[0];
   const maxChapter = book ? getMaxChapter(book.bookNumber) : null;
   const chapterFallback = requestedChapter || 1;
   const chapter = Math.max(
@@ -57,43 +99,83 @@ export default function Home({ searchParams }: HomeProps) {
           </p>
         </header>
 
-        <section className="rounded-2xl border border-amber-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
-          <form
-            className="grid gap-4 sm:grid-cols-[1fr_auto_auto] sm:items-end"
-            method="get"
-          >
-            <label className="flex flex-col gap-2 text-sm font-medium text-zinc-700">
-              Livre
-              <select
-                className="h-11 rounded-lg border border-amber-200 bg-white px-3 text-sm text-zinc-900 shadow-inner"
-                name="book"
-                defaultValue={book?.bookNumber ?? fallbackBook}
-              >
-                {books.map((item) => (
-                  <option key={item.bookNumber} value={item.bookNumber}>
+        <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-6 shadow-sm">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {groupBooks.map((group) => {
+                const isActive = group.key === activeGroup?.key;
+                const groupBook = group.items[0];
+                return (
+                  <Link
+                    key={group.key}
+                    href={`/?group=${group.key}&book=${groupBook?.bookNumber ?? fallbackBook}&chapter=1`}
+                    className={`rounded-md px-6 py-2 text-sm font-semibold ${
+                      isActive
+                        ? "bg-zinc-800 text-white"
+                        : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                    }`}
+                  >
+                    {group.label}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {activeGroup?.items.map((item) => {
+                const isActive = item.bookNumber === book?.bookNumber;
+                return (
+                  <Link
+                    key={item.bookNumber}
+                    href={`/?group=${activeGroup?.key}&book=${item.bookNumber}&chapter=1`}
+                    className={`rounded-md px-4 py-2 text-sm font-semibold ${
+                      isActive
+                        ? "bg-zinc-800 text-white"
+                        : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                    }`}
+                  >
                     {item.longName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-medium text-zinc-700">
-              Chapitre
-              <input
-                className="h-11 w-full rounded-lg border border-amber-200 bg-white px-3 text-sm text-zinc-900 shadow-inner"
-                name="chapter"
-                type="number"
-                min={1}
-                max={maxChapter ?? undefined}
-                defaultValue={chapter}
-              />
-            </label>
-            <button
-              className="h-11 rounded-lg bg-amber-900 px-5 text-sm font-semibold text-amber-50 hover:bg-amber-800"
-              type="submit"
-            >
-              Afficher
-            </button>
-          </form>
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="text-center text-xs text-zinc-500">
+              {book?.longName ?? "Livre"} {chapter}
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-6 shadow-sm">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
+                Chapitres
+              </p>
+              <span className="text-xs text-zinc-500">
+                {book?.longName ?? "Livre"} {chapter}
+              </span>
+            </div>
+            <div className="grid grid-cols-8 gap-2 text-center sm:grid-cols-12 md:grid-cols-16">
+              {maxChapter
+                ? Array.from({ length: maxChapter }, (_, index) => {
+                    const chapterNumber = index + 1;
+                    const isActive = chapterNumber === chapter;
+                    return (
+                      <Link
+                        key={chapterNumber}
+                        href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${chapterNumber}`}
+                        className={`flex h-9 items-center justify-center rounded-md text-sm font-semibold transition ${
+                          isActive
+                            ? "bg-zinc-800 text-white"
+                            : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
+                        }`}
+                      >
+                        {chapterNumber}
+                      </Link>
+                    );
+                  })
+                : null}
+            </div>
+          </div>
         </section>
 
         <section className="grid gap-6 md:grid-cols-2">
