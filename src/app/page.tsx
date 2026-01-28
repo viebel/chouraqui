@@ -1,8 +1,8 @@
 import Link from "next/link";
 
+import { ChapterVerseSelector } from "./components/ChapterVerseSelector";
 import { HistoryNav } from "./components/HistoryNav";
 import { ParallelVerses } from "./components/ParallelVerses";
-import { VerseSelector } from "./components/VerseSelector";
 import {
   getBook,
   getBooks,
@@ -87,13 +87,14 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div className="min-h-screen bg-[#fdfaf4] text-zinc-900">
-      <div className="border-b border-amber-200/70">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6 text-xs uppercase tracking-[0.28em] text-amber-800/80 sm:px-10">
-          <span>La Bible de Chouraqui</span>
-          <span>Edition numerique</span>
+      <div className="sticky top-0 z-20 bg-[#fdfaf4] backdrop-blur-sm">
+        <div className="border-b border-amber-200/70">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 text-xs uppercase tracking-[0.28em] text-amber-800/80 sm:px-10">
+            <span>La Bible de Chouraqui</span>
+            <span>Edition numerique</span>
+          </div>
         </div>
-      </div>
-      <div className="sticky top-0 z-10 bg-[#fdfaf4]/95 backdrop-blur-sm pb-4 pt-4 border-b border-amber-200/50">
+        <div className="pb-3 pt-3">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 sm:px-10">
           <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
           <div className="flex flex-col gap-4">
@@ -139,66 +140,32 @@ export default async function Home({ searchParams }: HomeProps) {
           </section>
 
           <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
-            <div className="flex flex-col gap-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
-                Chapitres
-              </p>
-              <div className="grid grid-cols-10 gap-2 text-center">
-                {maxChapter
-                  ? Array.from({ length: maxChapter }, (_, index) => {
-                      const chapterNumber = index + 1;
-                      const isActive = chapterNumber === chapter;
-                      return (
-                        <Link
-                          key={chapterNumber}
-                          href={`/?book=${book?.bookNumber ?? fallbackBook}&chapter=${chapterNumber}`}
-                          className={`flex h-8 items-center justify-center rounded-md text-sm font-semibold transition ${
-                            isActive
-                              ? "bg-zinc-800 text-white"
-                              : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300"
-                          }`}
-                        >
-                          {chapterNumber}
-                        </Link>
-                      );
-                    })
-                  : null}
-              </div>
-            </div>
+            <ChapterVerseSelector
+              maxChapter={maxChapter}
+              currentChapter={chapter}
+              verses={verses}
+              selectedVerse={selectedVerse}
+              bookNumber={book?.bookNumber ?? fallbackBook}
+            />
           </section>
-
-          {verses.length > 0 && (
-            <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
-              <div className="flex flex-col gap-3">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-800/80">
-                  Versets
-                </p>
-                <VerseSelector
-                  verses={verses}
-                  selectedVerse={selectedVerse}
-                  bookNumber={book?.bookNumber ?? fallbackBook}
-                  chapter={chapter}
-                />
-              </div>
-            </section>
-          )}
+        </div>
         </div>
       </div>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 sm:px-10 sm:py-16">
-        <article className="rounded-2xl border border-amber-200/80 bg-white/85 p-6 shadow-sm backdrop-blur">
-          {/* Header with labels */}
-          <div className={`mb-6 grid gap-4 ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
+      <main className="mx-auto flex w-full max-w-6xl flex-col px-6 py-3 sm:px-10 sm:py-4">
+        <article className="rounded-2xl border border-amber-200/80 bg-white/85 shadow-sm backdrop-blur">
+          {/* Sticky header with labels */}
+          <div className={`sticky top-[320px] z-[15] grid gap-6 rounded-t-2xl bg-white border-b border-amber-200/50 p-4 shadow-sm ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
             {hasHebrew && (
               <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
-                <span>עברית</span>
+                <span className="text-base font-semibold text-amber-950">{book?.longName ?? "Livre"} {chapter}</span>
                 <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
-                  Texte source
+                  עברית
                 </span>
               </div>
             )}
             <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
-              <span>Français</span>
+              <span className="text-base font-semibold text-amber-950">{book?.longName ?? "Livre"} {chapter}</span>
               <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
                 Traduction André Chouraqui
               </span>
@@ -206,18 +173,20 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
 
           {/* Parallel verses */}
-          {verses.length === 0 ? (
-            <p className="text-zinc-700">Aucun verset trouvé pour ce chapitre.</p>
-          ) : (
-            <ParallelVerses
-              frenchVerses={verses}
-              hebrewVerses={hebrewVerses}
-              bookName={book?.longName ?? "Livre"}
-              chapter={chapter}
-              selectedVerse={selectedVerse}
-              hasHebrew={hasHebrew}
-            />
-          )}
+          <div className="p-6 pt-4">
+            {verses.length === 0 ? (
+              <p className="text-zinc-700">Aucun verset trouvé pour ce chapitre.</p>
+            ) : (
+              <ParallelVerses
+                frenchVerses={verses}
+                hebrewVerses={hebrewVerses}
+                bookName={book?.longName ?? "Livre"}
+                chapter={chapter}
+                selectedVerse={selectedVerse}
+                hasHebrew={hasHebrew}
+              />
+            )}
+          </div>
         </article>
       </main>
     </div>

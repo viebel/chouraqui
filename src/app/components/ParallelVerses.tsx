@@ -73,14 +73,7 @@ export function ParallelVerses({
     text.replace(/« /g, "«\u00A0").replace(/ »/g, "\u00A0»");
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-lg font-semibold text-amber-950">
-          {bookName} {chapter}
-        </p>
-      </div>
-
-      <div className="space-y-4">
+    <div className="space-y-4">
         {frenchVerses.map((verse) => {
           const hebrewText = hebrewMap.get(verse.verse);
           const isSelected = verse.verse === selectedVerse;
@@ -118,7 +111,6 @@ export function ParallelVerses({
             </div>
           );
         })}
-      </div>
     </div>
   );
 }
