@@ -24,3 +24,72 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.tetragram {
+  --tetragram-size: 32px;
+  --tetragram-tall-scale: 2;
+  --tetragram-mid-scale: 1;
+  --tetragram-color: #3b2a14;
+  display: inline-block;
+  font-family: "Times New Roman", "Georgia", serif;
+  font-size: var(--tetragram-size);
+  color: var(--tetragram-color);
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.tetragram__adonai {
+  font-size: 0.52em;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  white-space: nowrap;
+  margin-bottom: 0.08em;
+}
+
+.tetragram__letters {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.06em;
+}
+
+.tetragram__middle {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  line-height: 1;
+}
+
+.tetragram__middle-line {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.06em;
+  transform: translateY(-0.1em);
+}
+
+.tetragram__letter--tall {
+  font-size: calc(var(--tetragram-size) * var(--tetragram-tall-scale));
+  line-height: 0.9;
+  font-weight: inherit;
+  transform: scaleX(0.94);
+  transform-origin: center bottom;
+}
+
+.tetragram__letter--mid {
+  font-size: calc(var(--tetragram-size) * var(--tetragram-mid-scale));
+  line-height: 0.9;
+}
+
+.tetragram--header {
+  --tetragram-size: 28px;
+}
+
+.tetragram--inline {
+  --tetragram-size: 1em;
+  display: inline-block;
+  margin: 0 0.12em;
+  vertical-align: text-bottom;
+  transform: translateY(0.08em);
+}

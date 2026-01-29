@@ -5,6 +5,7 @@ import { HistoryNav } from "./components/HistoryNav";
 import { ChapterProvider } from "./components/ChapterContext";
 import { ContentLabelsHeader } from "./components/ContentLabelsHeader";
 import { InfiniteParallelVerses } from "./components/InfiniteParallelVerses";
+import { Tetragram } from "./components/Tetragram";
 import {
   getBook,
   getBooks,
@@ -97,6 +98,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="border-b border-amber-200/70">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 text-xs uppercase tracking-[0.28em] text-amber-800/80 sm:px-10">
             <span>La Bible de Chouraqui</span>
+            <Tetragram className="tetragram--header" />
             <span>Edition numerique</span>
           </div>
         </div>

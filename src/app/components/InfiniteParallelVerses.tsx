@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useChapter } from "./ChapterContext";
+import { replaceTetragram } from "./tetragramMarkup";
 
 type FrenchVerse = {
   verse: number;
@@ -235,13 +236,15 @@ export function InfiniteParallelVerses({
   }, [hasPrev, loadingPrev, loadPrevChapter]);
 
   const formatText = (text: string) =>
-    text
-      .replace(/« /g, "«\u00A0")
-      .replace(/ »/g, "\u00A0»")
-      .replace(/‹ /g, "‹\u00A0")
-      .replace(/ ›/g, "\u00A0›")
-      .replace(/ ([?!;])/g, "\u00A0$1")
-      .replace(/ ?:(?=\s)/g, "\u00A0:");
+    replaceTetragram(
+      text
+        .replace(/« /g, "«\u00A0")
+        .replace(/ »/g, "\u00A0»")
+        .replace(/‹ /g, "‹\u00A0")
+        .replace(/ ›/g, "\u00A0›")
+        .replace(/ ([?!;])/g, "\u00A0$1")
+        .replace(/ ?:(?=\s)/g, "\u00A0:")
+    );
 
   return (
     <div ref={contentRef} className="space-y-8">

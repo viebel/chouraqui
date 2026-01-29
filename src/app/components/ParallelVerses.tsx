@@ -1,5 +1,7 @@
 "use client";
 
+import { replaceTetragram } from "./tetragramMarkup";
+
 type FrenchVerse = {
   verse: number;
   text: string;
@@ -70,13 +72,15 @@ export function ParallelVerses({
   const hebrewMap = new Map(hebrewVerses.map((v) => [v.verse, v.scripture]));
 
   const formatText = (text: string) =>
-    text
-      .replace(/« /g, "«\u00A0")
-      .replace(/ »/g, "\u00A0»")
-      .replace(/‹ /g, "‹\u00A0")
-      .replace(/ ›/g, "\u00A0›")
-      .replace(/ ([?!;])/g, "\u00A0$1")
-      .replace(/ ?:(?=\s)/g, "\u00A0:");
+    replaceTetragram(
+      text
+        .replace(/« /g, "«\u00A0")
+        .replace(/ »/g, "\u00A0»")
+        .replace(/‹ /g, "‹\u00A0")
+        .replace(/ ›/g, "\u00A0›")
+        .replace(/ ([?!;])/g, "\u00A0$1")
+        .replace(/ ?:(?=\s)/g, "\u00A0:")
+    );
 
   return (
     <div className="space-y-4">
