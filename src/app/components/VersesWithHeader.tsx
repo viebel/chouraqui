@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { InfiniteParallelVerses } from "./InfiniteParallelVerses";
+import { useChapter } from "./ChapterContext";
 
 type FrenchVerse = {
   verse: number;
@@ -63,12 +64,12 @@ export function VersesWithHeader({
   bookName,
   hasHebrew,
 }: Props) {
-  const [currentChapter, setCurrentChapter] = useState(initialChapter);
+  const { currentChapter, setCurrentChapter } = useChapter();
 
   // Reset current chapter when navigating to a new book/chapter
   useEffect(() => {
     setCurrentChapter(initialChapter);
-  }, [bookNumber, initialChapter]);
+  }, [bookNumber, initialChapter, setCurrentChapter]);
 
   return (
     <div className="relative">
@@ -108,7 +109,6 @@ export function VersesWithHeader({
                 selectedVerse={selectedVerse}
                 bookName={bookName}
                 hasHebrew={hasHebrew}
-                onChapterChange={setCurrentChapter}
               />
             )}
           </div>
