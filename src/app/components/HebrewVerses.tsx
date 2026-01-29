@@ -23,7 +23,10 @@ export function HebrewVerses({
       <p className="text-lg font-semibold text-amber-950">
         {bookName} {chapter}
       </p>
-      <div className="space-y-3 text-lg leading-8 text-zinc-700" dir="rtl">
+      <div
+        className="hebrew-text space-y-3 text-lg leading-8 text-zinc-700"
+        dir="rtl"
+      >
         {verses.map((verse) => (
           <p
             key={verse.verse}

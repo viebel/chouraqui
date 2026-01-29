@@ -98,7 +98,7 @@ export function ParallelVerses({
             >
               {/* Hebrew column */}
               {hasHebrew && (
-                <div className="flex-1 text-right" dir="rtl">
+                <div className="flex-1 text-right hebrew-text" dir="rtl">
                   <span className="ml-2 text-base font-semibold text-amber-800/70">
                     {toHebrewNumeral(verse.verse)}
                   </span>

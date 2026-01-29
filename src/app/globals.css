@@ -99,3 +99,11 @@ body {
 .verse-text {
   font-family: "EB Garamond", "Times New Roman", "Georgia", serif;
 }
+
+.hebrew-text {
+  display: block;
+  width: 100%;
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: right;
+}
