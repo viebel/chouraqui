@@ -99,7 +99,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 text-xs uppercase tracking-[0.28em] text-amber-800/80 sm:px-10">
             <span>La Bible de Chouraqui</span>
             <Tetragram className="tetragram--header" />
-            <span>Edition numerique</span>
+            <span>Édition numérique</span>
           </div>
         </div>
         <div className="pb-3 pt-3">
