@@ -70,7 +70,12 @@ export function ParallelVerses({
   const hebrewMap = new Map(hebrewVerses.map((v) => [v.verse, v.scripture]));
 
   const formatText = (text: string) =>
-    text.replace(/« /g, "«\u00A0").replace(/ »/g, "\u00A0»");
+    text
+      .replace(/« /g, "«\u00A0")
+      .replace(/ »/g, "\u00A0»")
+      .replace(/‹ /g, "‹\u00A0")
+      .replace(/ ›/g, "\u00A0›")
+      .replace(/ ([?!;:])/g, "\u00A0$1");
 
   return (
     <div className="space-y-4">

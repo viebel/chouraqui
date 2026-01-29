@@ -140,7 +140,12 @@ export function InfiniteVerses({
   }, [hasPrev, loadingPrev, loadPrevChapter]);
 
   const formatText = (text: string) =>
-    text.replace(/« /g, "«\u00A0").replace(/ »/g, "\u00A0»");
+    text
+      .replace(/« /g, "«\u00A0")
+      .replace(/ »/g, "\u00A0»")
+      .replace(/‹ /g, "‹\u00A0")
+      .replace(/ ›/g, "\u00A0›")
+      .replace(/ ([?!;:])/g, "\u00A0$1");
 
   return (
     <div ref={contentRef} className="space-y-8">
