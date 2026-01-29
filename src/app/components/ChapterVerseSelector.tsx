@@ -104,19 +104,11 @@ export function ChapterVerseSelector({
       { scroll: false }
     );
 
-    // Scroll to verse
+    // Scroll to verse after URL update renders
     setTimeout(() => {
       const verseElement = document.getElementById(`verset-${verseNumber}`);
       if (verseElement) {
-        const stickyHeader = document.querySelector(".sticky");
-        const headerHeight = stickyHeader?.getBoundingClientRect().height ?? 0;
-        const elementPosition =
-          verseElement.getBoundingClientRect().top + window.scrollY;
-        const offsetPosition = elementPosition - headerHeight - 16;
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
+        verseElement.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }, 100);
   };

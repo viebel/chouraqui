@@ -75,7 +75,8 @@ export function ParallelVerses({
       .replace(/ »/g, "\u00A0»")
       .replace(/‹ /g, "‹\u00A0")
       .replace(/ ›/g, "\u00A0›")
-      .replace(/ ([?!;:])/g, "\u00A0$1");
+      .replace(/ ([?!;])/g, "\u00A0$1")
+      .replace(/ ?:(?=\s)/g, "\u00A0:");
 
   return (
     <div className="space-y-4">
