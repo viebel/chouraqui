@@ -109,13 +109,11 @@ body {
 }
 
 .french-text {
-  text-align: left;
-}
-
-.french-text__content {
-  display: inline-block;
-  width: 100%;
   text-align: justify;
   text-justify: inter-word;
   text-align-last: left;
+}
+
+.french-text__content {
+  display: inline;
 }
