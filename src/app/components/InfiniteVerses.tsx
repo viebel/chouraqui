@@ -176,7 +176,7 @@ export function InfiniteVerses({
                     ? `verset-${verse.verse}`
                     : undefined
                 }
-                className={`scroll-mt-[400px] rounded-lg px-2 py-1 transition-colors ${
+                className={`french-text scroll-mt-[400px] rounded-lg px-2 py-1 transition-colors ${
                   chapterData.chapter === initialChapter &&
                   verse.verse === selectedVerse
                     ? "bg-amber-100/80"
@@ -187,7 +187,7 @@ export function InfiniteVerses({
                   {verse.verse}
                 </span>
                 <span
-                  className="verse-text"
+                  className="french-text__content verse-text"
                   dangerouslySetInnerHTML={{ __html: formatText(verse.text) }}
                 />
               </p>

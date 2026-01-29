@@ -109,12 +109,12 @@ export function ParallelVerses({
               )}
 
               {/* French column */}
-              <div className="flex-1">
+              <div className="flex-1 french-text">
                 <span className="mr-2 text-xs font-semibold text-amber-800/70">
                   {verse.verse}
                 </span>
                 <span
-                  className="verse-text text-lg leading-10 text-zinc-700"
+                  className="french-text__content verse-text text-lg leading-10 text-zinc-700"
                   dangerouslySetInnerHTML={{ __html: formatText(verse.text) }}
                 />
               </div>
