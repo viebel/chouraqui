@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -31,7 +32,7 @@ body {
   --tetragram-mid-scale: 1;
   --tetragram-color: #3b2a14;
   display: inline-block;
-  font-family: "Times New Roman", "Georgia", serif;
+  font-family: "EB Garamond", "Times New Roman", "Georgia", serif;
   font-size: var(--tetragram-size);
   color: var(--tetragram-color);
   line-height: 1;
@@ -84,6 +85,7 @@ body {
 
 .tetragram--header {
   --tetragram-size: 28px;
+  --tetragram-color: currentColor;
 }
 
 .tetragram--inline {
@@ -92,4 +94,8 @@ body {
   margin: 0 0.12em;
   vertical-align: text-bottom;
   transform: translateY(0.08em);
+}
+
+.verse-text {
+  font-family: "EB Garamond", "Times New Roman", "Georgia", serif;
 }

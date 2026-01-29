@@ -187,6 +187,7 @@ export function InfiniteVerses({
                   {verse.verse}
                 </span>
                 <span
+                  className="verse-text"
                   dangerouslySetInnerHTML={{ __html: formatText(verse.text) }}
                 />
               </p>

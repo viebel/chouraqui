@@ -309,7 +309,7 @@ export function InfiniteParallelVerses({
                       {verse.verse}
                     </span>
                     <span
-                      className="text-lg leading-10 text-zinc-700"
+                      className="verse-text text-lg leading-10 text-zinc-700"
                       dangerouslySetInnerHTML={{ __html: formatText(verse.text) }}
                     />
                   </div>
