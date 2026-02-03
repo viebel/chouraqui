@@ -19,7 +19,7 @@ const frankRuhlLibre = Frank_Ruhl_Libre({
 });
 
 export const metadata: Metadata = {
-  title: "La Bible de Chouraqui",
+  title: "La Bible Chouraqui",
   description:
     "Affichage de la Bible en hébreu et en français avec les traductions d'André Chouraqui.",
 };
