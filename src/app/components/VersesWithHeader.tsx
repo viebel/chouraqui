@@ -77,7 +77,7 @@ export function VersesWithHeader({
       <div className="sticky top-[252px] z-[15] mx-auto w-full max-w-6xl px-6 sm:px-10">
         <div className={`grid gap-6 rounded-t-2xl border border-amber-200/80 border-b-0 bg-white p-4 shadow-sm ${hasHebrew ? "md:grid-cols-2" : "grid-cols-1"}`}>
           {hasHebrew && (
-            <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
+            <div className="hidden md:flex items-center justify-between text-sm font-semibold text-amber-900/70">
               <span className="text-base font-semibold text-amber-950">{bookName} {currentChapter}</span>
               <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
                 עברית
@@ -85,8 +85,8 @@ export function VersesWithHeader({
             </div>
           )}
           <div className="flex items-center justify-between text-sm font-semibold text-amber-900/70">
-            <span className="text-base font-semibold text-amber-950">{bookName} {currentChapter}</span>
-            <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800">
+            <span className="hidden md:inline text-base font-semibold text-amber-950">{bookName} {currentChapter}</span>
+            <span className="rounded-full bg-amber-100/70 px-3 py-1 text-xs text-amber-800 md:ml-auto">
               Traduction André Chouraqui
             </span>
           </div>

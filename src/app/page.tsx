@@ -91,15 +91,42 @@ export default async function Home({ searchParams }: HomeProps) {
   const nextChapter =
     maxChapter && chapter < maxChapter ? chapter + 1 : null;
 
+  const bookIndex = book
+    ? books.findIndex((b) => b.bookNumber === book.bookNumber)
+    : -1;
+  const nextBook = bookIndex >= 0 && bookIndex < books.length - 1
+    ? books[bookIndex + 1]
+    : null;
+  const prevBook = bookIndex > 0 ? books[bookIndex - 1] : null;
+  const prevChapterLastVerse =
+    book && chapter > 1
+      ? (() => {
+          const prevChVerses = getVerses(book.bookNumber, chapter - 1);
+          return prevChVerses.length > 0
+            ? Math.max(...prevChVerses.map((v) => v.verse))
+            : 1;
+        })()
+      : null;
+  const prevBookLastChapter = prevBook
+    ? getMaxChapter(prevBook.bookNumber)
+    : null;
+  const prevBookLastVerse =
+    prevBook && prevBookLastChapter
+      ? (() => {
+          const vs = getVerses(prevBook.bookNumber, prevBookLastChapter);
+          return vs.length > 0 ? Math.max(...vs.map((v) => v.verse)) : 1;
+        })()
+      : null;
+
   return (
     <ChapterProvider initialChapter={chapter}>
-    <div className="min-h-screen bg-[#fdfaf4] text-zinc-900">
-      <div className="sticky top-0 z-20 bg-[#fdfaf4] backdrop-blur-sm">
+    <div className="h-screen flex flex-col bg-[#fdfaf4] text-zinc-900 md:h-auto md:min-h-screen">
+      <div className="sticky top-0 z-20 flex-shrink-0 overflow-visible bg-[#fdfaf4] backdrop-blur-sm">
         <div className="border-b border-amber-200/70">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 text-xs uppercase tracking-[0.28em] text-amber-800/80 sm:px-10">
-            <span>La Bible Chouraqui</span>
-            <Tetragram className="tetragram--header" />
-            <span>Édition numérique</span>
+          <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4 text-xs uppercase tracking-[0.28em] text-amber-800/80 sm:px-10 md:justify-between">
+            <span className="min-w-0 flex-1 text-center md:flex-none md:text-left">La Bible Chouraqui</span>
+            <Tetragram className="tetragram--header mx-6 flex-shrink-0 md:mx-0" />
+            <span className="min-w-0 flex-1 text-center md:flex-none md:text-right">Édition numérique</span>
           </div>
         </div>
         <div className="pb-3 pt-3">
@@ -150,9 +177,9 @@ export default async function Home({ searchParams }: HomeProps) {
       </div>
 
       {/* Verses */}
-      <main className="mx-auto flex w-full max-w-6xl flex-col px-6 sm:px-10 -mt-[2px]">
-        <article className="rounded-t-none rounded-b-2xl border border-amber-200/80 border-t-0 bg-white/85 shadow-sm backdrop-blur mb-6">
-          <div className="p-6 pt-4">
+      <main className="mx-auto flex w-full max-w-6xl flex-col px-6 sm:px-10 -mt-[2px] max-md:flex-1 max-md:min-h-0 max-md:overflow-y-auto">
+        <article className="max-md:mb-0 max-md:flex max-md:flex-1 max-md:flex-col max-md:min-h-0 md:mb-6 md:block md:rounded-b-2xl md:border md:border-amber-200/80 md:border-t-0 md:bg-white/85 md:shadow-sm md:backdrop-blur">
+          <div className="max-md:flex max-md:flex-1 max-md:flex-col max-md:min-h-0 max-md:pt-4 max-md:pb-6 max-md:px-0 md:p-6 md:pt-4">
             {verses.length === 0 ? (
               <p className="text-zinc-700">Aucun verset trouvé pour ce chapitre.</p>
             ) : (
@@ -165,6 +192,11 @@ export default async function Home({ searchParams }: HomeProps) {
                 selectedVerse={selectedVerse}
                 bookName={book?.longName ?? "Livre"}
                 hasHebrew={hasHebrew}
+                nextBookNumber={nextBook?.bookNumber ?? null}
+                prevBookNumber={prevBook?.bookNumber ?? null}
+                prevBookLastChapter={prevBookLastChapter}
+                prevBookLastVerse={prevBookLastVerse}
+                prevChapterLastVerse={prevChapterLastVerse}
               />
             )}
           </div>

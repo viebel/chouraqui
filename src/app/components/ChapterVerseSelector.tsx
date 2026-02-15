@@ -60,7 +60,7 @@ function CustomDropdown({ label, value, options, onChange }: CustomDropdownProps
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 z-50 mt-2 max-h-72 w-[min(100vw-2rem,20rem)] overflow-auto rounded-xl border border-amber-200/80 bg-white py-3 px-3 shadow-xl md:w-auto md:min-w-[12rem] md:rounded-2xl">
+          <div className="absolute left-0 z-50 max-h-72 w-[min(100vw-2rem,20rem)] overflow-auto rounded-xl border border-amber-200/80 bg-white py-3 px-3 shadow-xl bottom-full mb-2 md:bottom-auto md:mb-0 md:top-full md:mt-2 md:w-auto md:min-w-[20rem] md:rounded-2xl">
             <div className="grid grid-cols-8 gap-1.5 md:grid-cols-10">
               {options.map((option) => (
                 <button

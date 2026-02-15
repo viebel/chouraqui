@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useChapter } from "./ChapterContext";
 import { replaceTetragram } from "./tetragramMarkup";
 
@@ -29,6 +32,11 @@ type Props = {
   selectedVerse: number;
   bookName: string;
   hasHebrew: boolean;
+  nextBookNumber?: number | null;
+  prevBookNumber?: number | null;
+  prevBookLastChapter?: number | null;
+  prevBookLastVerse?: number | null;
+  prevChapterLastVerse?: number | null;
 };
 
 // Convert number to Hebrew letters (gematria)
@@ -81,6 +89,11 @@ export function InfiniteParallelVerses({
   selectedVerse,
   bookName,
   hasHebrew,
+  nextBookNumber = null,
+  prevBookNumber = null,
+  prevBookLastChapter = null,
+  prevBookLastVerse = null,
+  prevChapterLastVerse = null,
 }: Props) {
   const { setCurrentChapter } = useChapter();
   const [chapters, setChapters] = useState<ChapterData[]>([
@@ -94,9 +107,14 @@ export function InfiniteParallelVerses({
   const chapterRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const prevChapterLoadAllowedRef = useRef(selectedVerse <= 1);
 
-  // Navigate to verse first (scroll into view), then allow loading previous chapter
+  // On desktop: scroll verse into view when selectedVerse changes. On mobile: no scroll (single-verse view).
   useEffect(() => {
     if (selectedVerse <= 1) {
+      prevChapterLoadAllowedRef.current = true;
+      return;
+    }
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    if (isMobile) {
       prevChapterLoadAllowedRef.current = true;
       return;
     }
@@ -105,7 +123,7 @@ export function InfiniteParallelVerses({
     const scrollToVerse = () => {
       const el = document.getElementById(verseId);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
         prevChapterLoadAllowedRef.current = true;
         return true;
       }
@@ -282,16 +300,169 @@ export function InfiniteParallelVerses({
         .replace(/ ?:(?=\s)/g, "\u00A0:")
     );
 
+  const verseRowBase =
+    "rounded-lg p-3 transition-colors scroll-mt-[400px] hover:bg-amber-50/50";
+  const verseRowSelected = "bg-amber-100/80";
+  const boxStyle =
+    "rounded-xl border border-amber-200/80 bg-amber-50/20 flex flex-col min-h-0 overflow-hidden";
+
+  const searchParams = useSearchParams();
+  const currentChapterData = chapters.find((c) => c.chapter === initialChapter) ?? chapters[0];
+  const currentVerse =
+    currentChapterData?.frenchVerses.find((v) => v.verse === selectedVerse);
+  const currentHebrewMap = currentChapterData
+    ? new Map(
+        currentChapterData.hebrewVerses.map((v) => [v.verse, v.scripture])
+      )
+    : null;
+  const currentHebrewText =
+    currentVerse && currentHebrewMap
+      ? currentHebrewMap.get(currentVerse.verse)
+      : null;
+
+  const maxVerseInChapter = initialFrenchVerses.length
+    ? Math.max(...initialFrenchVerses.map((v) => v.verse))
+    : 1;
+
+  const buildUrl = (b: number, ch: number, v: number) => {
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
+    params.set("book", String(b));
+    params.set("chapter", String(ch));
+    params.set("verse", String(v));
+    return `/?${params.toString()}`;
+  };
+
+  const prevUrl =
+    selectedVerse > 1
+      ? buildUrl(bookNumber, initialChapter, selectedVerse - 1)
+      : initialChapter > 1 && prevChapterLastVerse != null
+        ? buildUrl(bookNumber, initialChapter - 1, prevChapterLastVerse)
+        : prevBookNumber != null &&
+            prevBookLastChapter != null &&
+            prevBookLastVerse != null
+          ? buildUrl(prevBookNumber, prevBookLastChapter, prevBookLastVerse)
+          : null;
+
+  const nextUrl =
+    selectedVerse < maxVerseInChapter
+      ? buildUrl(bookNumber, initialChapter, selectedVerse + 1)
+      : initialChapter < (maxChapter ?? 0)
+        ? buildUrl(bookNumber, initialChapter + 1, 1)
+        : nextBookNumber != null
+          ? buildUrl(nextBookNumber, 1, 1)
+          : null;
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const mobileVerseNav =
+    currentVerse &&
+    mounted &&
+    typeof document !== "undefined" &&
+    createPortal(
+      <div className="md:hidden" role="presentation">
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-between gap-3 border-t border-amber-200/80 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] backdrop-blur"
+          aria-label="Navigation verset"
+        >
+          {prevUrl !== null ? (
+            <Link
+              href={prevUrl}
+              className="flex flex-1 items-center justify-center rounded-xl border border-amber-200/80 bg-amber-50/30 px-4 py-3 text-lg font-semibold text-amber-900 shadow-sm transition-colors hover:bg-amber-100/50 active:bg-amber-200/50"
+              aria-label="Précédent"
+            >
+              ←
+            </Link>
+          ) : (
+            <span className="flex-1" />
+          )}
+          {nextUrl !== null ? (
+            <Link
+              href={nextUrl}
+              className="flex flex-1 items-center justify-center rounded-xl border border-amber-200/80 bg-amber-50/30 px-4 py-3 text-lg font-semibold text-amber-900 shadow-sm transition-colors hover:bg-amber-100/50 active:bg-amber-200/50"
+              aria-label="Suivant"
+            >
+              →
+            </Link>
+          ) : (
+            <span className="flex-1" />
+          )}
+        </nav>
+      </div>,
+      document.body
+    );
+
   return (
-    <div ref={contentRef} className="space-y-8">
+    <div
+      ref={contentRef}
+      className={`space-y-8 ${currentVerse ? "max-md:flex max-md:flex-col max-md:flex-1 max-md:min-h-0" : ""}`}
+    >
       {hasPrev && (
         <div
           ref={prevTriggerRef}
-          className="flex items-center justify-center py-6 text-sm text-amber-800/60"
+          className="hidden md:flex items-center justify-center py-6 text-sm text-amber-800/60"
         >
           {loadingPrev ? "Chargement..." : ""}
         </div>
       )}
+
+      {/* Mobile: single verse box (French + Hebrew) with rounded borders, fills all available space */}
+      {hasHebrew && currentVerse && (
+        <div
+          id={`verset-${selectedVerse}`}
+          className="md:hidden w-full px-0 pb-24 scroll-mt-[260px] flex flex-col min-h-0 flex-1"
+          style={{ minHeight: "calc(100vh - 10rem)" }}
+        >
+          <div className="rounded-2xl border border-amber-200/80 bg-white overflow-hidden flex flex-col min-h-0 flex-1 w-full h-full">
+            <div className="overflow-y-auto flex-1 min-h-0 p-4">
+              <div className="french-text">
+                <span className="mr-2 text-xs font-semibold text-amber-800/70">
+                  {currentVerse.verse}
+                </span>
+                <span
+                  className="french-text__content verse-text text-lg leading-8 text-zinc-700"
+                  dangerouslySetInnerHTML={{
+                    __html: formatText(currentVerse.text),
+                  }}
+                />
+              </div>
+              <div className="pt-3 text-right hebrew-text" dir="rtl">
+                <span className="ml-2 text-base font-semibold text-amber-800/70">
+                  {toHebrewNumeral(currentVerse.verse)}
+                </span>
+                <span className="font-[family-name:var(--font-hebrew)] text-2xl leading-10 text-zinc-700">
+                  {currentHebrewText ?? "—"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {!hasHebrew && currentVerse && (
+        <div
+          id={`verset-${selectedVerse}`}
+          className="md:hidden w-full pb-24 scroll-mt-[260px] flex flex-col min-h-0 flex-1"
+          style={{ minHeight: "calc(100vh - 10rem)" }}
+        >
+          <div className="rounded-2xl border border-amber-200/80 bg-white overflow-hidden flex flex-col min-h-0 flex-1 w-full h-full">
+            <div className="overflow-y-auto flex-1 min-h-0 p-4">
+              <div className="french-text">
+                <span className="mr-2 text-xs font-semibold text-amber-800/70">
+                  {currentVerse.verse}
+                </span>
+                <span
+                  className="french-text__content verse-text text-lg leading-8 text-zinc-700"
+                  dangerouslySetInnerHTML={{
+                    __html: formatText(currentVerse.text),
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mobileVerseNav}
 
       {chapters.map((chapterData, chapterIndex) => {
         const hebrewMap = new Map(chapterData.hebrewVerses.map((v) => [v.verse, v.scripture]));
@@ -304,9 +475,9 @@ export function InfiniteParallelVerses({
             data-chapter={chapterData.chapter}
             className="space-y-4"
           >
-            {/* Chapter separator (not for first displayed chapter) */}
+            {/* Chapter separator (not for first displayed chapter); book/chapter name hidden on mobile */}
             {chapterIndex > 0 && (
-              <div className="flex items-center gap-4 py-4">
+              <div className="hidden md:flex items-center gap-4 py-4">
                 <div className="h-px flex-1 bg-amber-200/70" />
                 <span className="text-sm font-semibold text-amber-800/70">
                   {bookName} {chapterData.chapter}
@@ -315,43 +486,47 @@ export function InfiniteParallelVerses({
               </div>
             )}
 
-            {chapterData.frenchVerses.map((verse) => {
-              const hebrewText = hebrewMap.get(verse.verse);
-              const isSelected = isInitialChapter && verse.verse === selectedVerse;
+            {/* Desktop (or no Hebrew): verse rows */}
+            <div className={hasHebrew ? "hidden md:block" : ""}>
+              {chapterData.frenchVerses.map((verse) => {
+                const hebrewText = hebrewMap.get(verse.verse);
+                const isSelected =
+                  isInitialChapter && verse.verse === selectedVerse;
 
-              return (
-                <div
-                  key={`${chapterData.chapter}-${verse.verse}`}
-                  id={isInitialChapter ? `verset-${verse.verse}` : undefined}
-                  className={`flex rounded-lg p-3 transition-colors scroll-mt-[400px] ${
-                    isSelected ? "bg-amber-100/80" : "hover:bg-amber-50/50"
-                  } ${hasHebrew ? "flex-row gap-6" : "flex-col"}`}
-                >
-                  {/* Hebrew column */}
-                  {hasHebrew && (
-                    <div className="flex-1 text-right hebrew-text" dir="rtl">
-                      <span className="ml-2 text-base font-semibold text-amber-800/70">
-                        {toHebrewNumeral(verse.verse)}
+                return (
+                  <div
+                    key={`${chapterData.chapter}-${verse.verse}`}
+                    id={isInitialChapter ? `verset-${verse.verse}` : undefined}
+                    className={`flex rounded-lg p-3 transition-colors scroll-mt-[400px] ${
+                      isSelected ? "bg-amber-100/80" : "hover:bg-amber-50/50"
+                    } ${hasHebrew ? "flex-row gap-6" : "flex-col"}`}
+                  >
+                    {hasHebrew && (
+                      <div className="flex-1 text-right hebrew-text" dir="rtl">
+                        <span className="ml-2 text-base font-semibold text-amber-800/70">
+                          {toHebrewNumeral(verse.verse)}
+                        </span>
+                        <span className="font-[family-name:var(--font-hebrew)] text-2xl leading-10 text-zinc-700">
+                          {hebrewText ?? "—"}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex-1 french-text">
+                      <span className="mr-2 text-xs font-semibold text-amber-800/70">
+                        {verse.verse}
                       </span>
-                      <span className="font-[family-name:var(--font-hebrew)] text-2xl leading-10 text-zinc-700">
-                        {hebrewText ?? "—"}
-                      </span>
+                      <span
+                        className="french-text__content verse-text text-lg leading-10 text-zinc-700"
+                        dangerouslySetInnerHTML={{
+                          __html: formatText(verse.text),
+                        }}
+                      />
                     </div>
-                  )}
-
-                  {/* French column */}
-                  <div className="flex-1 french-text">
-                    <span className="mr-2 text-xs font-semibold text-amber-800/70">
-                      {verse.verse}
-                    </span>
-                    <span
-                      className="french-text__content verse-text text-lg leading-10 text-zinc-700"
-                      dangerouslySetInnerHTML={{ __html: formatText(verse.text) }}
-                    />
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         );
       })}
@@ -359,7 +534,7 @@ export function InfiniteParallelVerses({
       {hasNext && (
         <div
           ref={nextTriggerRef}
-          className="flex items-center justify-center py-6 text-sm text-amber-800/60"
+          className="hidden md:flex items-center justify-center py-6 text-sm text-amber-800/60"
         >
           {loadingNext ? "Chargement..." : ""}
         </div>

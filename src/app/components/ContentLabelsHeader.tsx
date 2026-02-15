@@ -52,7 +52,7 @@ export function ContentLabelsHeader({ bookName, hebrewBookName, commonFrenchName
     : bookName;
 
   return (
-    <div className="rounded-t-2xl border border-amber-200/80 border-b-0 bg-white px-6 py-4">
+    <div className="rounded-t-2xl border border-amber-200/80 border-b-0 bg-white px-6 py-4 hidden md:block">
       <div className={`flex items-baseline p-3 ${hasHebrew ? "flex-row gap-6" : "flex-col"}`}>
         {hasHebrew && (
           <div className="flex-1 text-right" dir="rtl">

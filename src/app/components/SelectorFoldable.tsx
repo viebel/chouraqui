@@ -16,7 +16,7 @@ export function SelectorFoldable({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-2xl border border-amber-200/80 bg-white/90 shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-amber-200/80 bg-white/90 shadow-sm overflow-visible">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -42,7 +42,7 @@ export function SelectorFoldable({
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out border-t border-amber-200/80 md:border-t-0 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"} md:grid-rows-[1fr]`}
       >
-        <div className="overflow-hidden min-h-0">
+        <div className={`min-h-0 ${isOpen ? "overflow-visible" : "overflow-hidden"}`}>
           <div className="p-4 flex flex-col gap-4">
             {children}
           </div>

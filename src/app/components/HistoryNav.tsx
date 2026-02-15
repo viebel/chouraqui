@@ -2,7 +2,7 @@
 
 export function HistoryNav() {
   return (
-    <div className="flex items-center gap-1">
+    <div className="hidden md:flex items-center gap-1">
       <button
         onClick={() => history.back()}
         className="flex h-9 w-9 items-center justify-center rounded-full border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/50 text-amber-700 hover:border-amber-300 hover:shadow-sm cursor-pointer transition-all"
