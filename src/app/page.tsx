@@ -40,9 +40,13 @@ export default async function Home({ searchParams }: HomeProps) {
     60, 70, 90, 100, 110, 120, 290, 300, 330, 350, 360, 370, 380, 390, 400,
     410, 420, 430, 440, 450, 460,
   ]);
-  const hagiographes = new Set([
-    80, 130, 140, 150, 160, 190, 220, 230, 240, 250, 260, 310, 340,
-  ]);
+  // Ketuvim (Writings) in traditional Jewish order: Sifrei Emet (Psalms, Proverbs, Job),
+  // then Hamesh Megillot (Song of Songs, Ruth, Lamentations, Ecclesiastes, Esther),
+  // then Daniel, Ezra–Nehemiah, Chronicles
+  const hagiographesOrder: number[] = [
+    230, 240, 220, 260, 80, 310, 250, 190, 340, 150, 160, 130, 140,
+  ]; // Psaumes, Proverbes, Job, Cantique, Ruth, Lamentations, Ecclésiaste, Esther, Daniel, Esdras, Néhémie, 1–2 Chroniques
+  const hagiographes = new Set(hagiographesOrder);
 
   const groupBooks = [
     {
@@ -58,7 +62,9 @@ export default async function Home({ searchParams }: HomeProps) {
     {
       key: "hagiographes",
       label: "Hagiographes",
-      items: books.filter((bookItem) => hagiographes.has(bookItem.bookNumber)),
+      items: hagiographesOrder
+        .map((bookNumber) => books.find((b) => b.bookNumber === bookNumber))
+        .filter((b): b is NonNullable<typeof b> => b != null),
     },
   ];
 
@@ -91,13 +97,16 @@ export default async function Home({ searchParams }: HomeProps) {
   const nextChapter =
     maxChapter && chapter < maxChapter ? chapter + 1 : null;
 
-  const bookIndex = book
-    ? books.findIndex((b) => b.bookNumber === book.bookNumber)
+  const booksInGroup = activeGroup?.items ?? [];
+  const bookIndexInGroup = book
+    ? booksInGroup.findIndex((b) => b.bookNumber === book.bookNumber)
     : -1;
-  const nextBook = bookIndex >= 0 && bookIndex < books.length - 1
-    ? books[bookIndex + 1]
-    : null;
-  const prevBook = bookIndex > 0 ? books[bookIndex - 1] : null;
+  const nextBook =
+    bookIndexInGroup >= 0 && bookIndexInGroup < booksInGroup.length - 1
+      ? booksInGroup[bookIndexInGroup + 1]
+      : null;
+  const prevBook =
+    bookIndexInGroup > 0 ? booksInGroup[bookIndexInGroup - 1] : null;
   const prevChapterLastVerse =
     book && chapter > 1
       ? (() => {
