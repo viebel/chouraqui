@@ -1,7 +1,7 @@
-import Link from "next/link";
-
+import { BookGroupSelector } from "./components/BookGroupSelector";
 import { ChapterVerseSelector } from "./components/ChapterVerseSelector";
 import { HistoryNav } from "./components/HistoryNav";
+import { SelectorFoldable } from "./components/SelectorFoldable";
 import { ChapterProvider } from "./components/ChapterContext";
 import { ContentLabelsHeader } from "./components/ContentLabelsHeader";
 import { InfiniteParallelVerses } from "./components/InfiniteParallelVerses";
@@ -104,51 +104,27 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
         <div className="pb-3 pt-3">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 sm:px-10">
-          <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              {groupBooks.map((group) => {
-                const isActive = group.key === activeGroup?.key;
-                const groupBook = group.items[0];
-                return (
-                  <Link
-                    key={group.key}
-                    href={`/?group=${group.key}&book=${groupBook?.bookNumber ?? fallbackBook}&chapter=1`}
-                    className={`rounded-full border-2 px-5 py-2 text-sm font-semibold transition-all ${
-                      isActive
-                        ? "border-amber-400 bg-amber-50 text-amber-900"
-                        : "border-transparent bg-gradient-to-b from-white to-amber-50/50 text-amber-800/70 hover:border-amber-200 hover:text-amber-900"
-                    }`}
-                  >
-                    {group.label}
-                  </Link>
-                );
-              })}
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-2 min-h-[76px]">
-              {activeGroup?.items.map((item) => {
-                const isActive = item.bookNumber === book?.bookNumber;
-                const displayName = getCommonFrenchName(item.bookNumber) ?? item.longName;
-                return (
-                  <Link
-                    key={item.bookNumber}
-                    href={`/?group=${activeGroup?.key}&book=${item.bookNumber}&chapter=1`}
-                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-all ${
-                      isActive
-                        ? "border-amber-400 bg-amber-50 text-amber-900"
-                        : "border-transparent text-amber-800/70 hover:bg-amber-50 hover:text-amber-900"
-                    }`}
-                  >
-                    {displayName}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-          </section>
-
-          <section className="rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-sm">
-            <div className="flex items-center gap-4">
+          <SelectorFoldable
+            summary={
+              [commonFrenchName ?? "Livre", chapter, selectedVerse]
+                .filter(Boolean)
+                .join(" · ")
+            }
+          >
+            <BookGroupSelector
+              groupBooks={groupBooks.map((group) => ({
+                key: group.key,
+                label: group.label,
+                items: group.items.map((item) => ({
+                  bookNumber: item.bookNumber,
+                  displayName: getCommonFrenchName(item.bookNumber) ?? item.longName,
+                })),
+              }))}
+              activeGroupKey={activeGroup?.key ?? groupBooks[0]?.key}
+              currentBookNumber={book?.bookNumber ?? fallbackBook}
+              fallbackBook={fallbackBook}
+            />
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
               <HistoryNav />
               <ChapterVerseSelector
                 maxChapter={maxChapter}
@@ -158,7 +134,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 bookNumber={book?.bookNumber ?? fallbackBook}
               />
             </div>
-          </section>
+          </SelectorFoldable>
 
         </div>
         </div>

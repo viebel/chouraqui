@@ -38,18 +38,19 @@ function CustomDropdown({ label, value, options, onChange }: CustomDropdownProps
   }, []);
 
   return (
-    <div className="flex items-center gap-3">
-      <label className="text-sm font-semibold uppercase tracking-[0.15em] text-amber-800/80">
+    <div className="flex flex-col gap-1.5 md:flex-row md:items-center md:gap-3">
+      <label className="text-xs font-semibold uppercase tracking-wider text-amber-800/80 md:text-sm">
         {label}
       </label>
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative w-full md:w-auto" ref={dropdownRef}>
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 rounded-full border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/50 px-5 py-2 text-sm font-semibold text-amber-900 shadow-sm transition-all hover:border-amber-300 hover:shadow focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+          className="flex w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-gradient-to-b from-white to-amber-50/50 px-4 py-3 text-sm font-semibold text-amber-900 shadow-sm transition-all hover:border-amber-300 hover:shadow focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 md:w-auto md:rounded-full md:px-5 md:py-2"
         >
           <span className="min-w-[2ch] text-center">{value}</span>
           <svg
-            className={`h-4 w-4 text-amber-700 transition-transform ${isOpen ? "rotate-180" : ""}`}
+            className={`h-4 w-4 shrink-0 text-amber-700 transition-transform ${isOpen ? "rotate-180" : ""}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -59,16 +60,17 @@ function CustomDropdown({ label, value, options, onChange }: CustomDropdownProps
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 z-50 mt-2 max-h-72 overflow-auto rounded-2xl border border-amber-200/80 bg-white py-3 px-3 shadow-xl">
-            <div className="grid grid-cols-10 gap-1.5" style={{ width: "340px" }}>
+          <div className="absolute top-full left-0 z-50 mt-2 max-h-72 w-[min(100vw-2rem,20rem)] overflow-auto rounded-xl border border-amber-200/80 bg-white py-3 px-3 shadow-xl md:w-auto md:min-w-[12rem] md:rounded-2xl">
+            <div className="grid grid-cols-8 gap-1.5 md:grid-cols-10">
               {options.map((option) => (
                 <button
                   key={option}
+                  type="button"
                   onClick={() => {
                     onChange(option);
                     setIsOpen(false);
                   }}
-                  className={`flex h-8 items-center justify-center rounded-md text-sm font-medium transition-all ${
+                  className={`flex h-9 min-h-[2.25rem] items-center justify-center rounded-lg text-sm font-medium transition-all touch-manipulation md:h-8 md:rounded-md ${
                     option === value
                       ? "bg-amber-600 text-white shadow-sm"
                       : "text-amber-800 hover:bg-amber-100"
@@ -120,7 +122,7 @@ export function ChapterVerseSelector({
   const verseOptions = verses.map((v) => v.verse);
 
   return (
-    <div className="flex items-center gap-6 flex-wrap">
+    <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6 md:flex-wrap">
       <CustomDropdown
         label="Chapitre"
         value={currentChapter}
