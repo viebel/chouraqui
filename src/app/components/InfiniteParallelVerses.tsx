@@ -92,6 +92,38 @@ export function InfiniteParallelVerses({
   const prevTriggerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const chapterRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const prevChapterLoadAllowedRef = useRef(selectedVerse <= 1);
+
+  // Navigate to verse first (scroll into view), then allow loading previous chapter
+  useEffect(() => {
+    if (selectedVerse <= 1) {
+      prevChapterLoadAllowedRef.current = true;
+      return;
+    }
+    prevChapterLoadAllowedRef.current = false;
+    const verseId = `verset-${selectedVerse}`;
+    const scrollToVerse = () => {
+      const el = document.getElementById(verseId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        prevChapterLoadAllowedRef.current = true;
+        return true;
+      }
+      return false;
+    };
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const rafId = requestAnimationFrame(() => {
+      if (!scrollToVerse()) {
+        timeoutId = setTimeout(() => {
+          scrollToVerse();
+        }, 150);
+      }
+    });
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [selectedVerse, initialChapter]);
 
   // Track visible chapter using scroll event
   useEffect(() => {
@@ -223,7 +255,11 @@ export function InfiniteParallelVerses({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !loadingPrev) {
+        if (
+          entries[0].isIntersecting &&
+          !loadingPrev &&
+          prevChapterLoadAllowedRef.current
+        ) {
           loadPrevChapter();
         }
       },

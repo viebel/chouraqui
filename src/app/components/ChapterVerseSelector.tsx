@@ -108,7 +108,7 @@ export function ChapterVerseSelector({
     setTimeout(() => {
       const verseElement = document.getElementById(`verset-${verseNumber}`);
       if (verseElement) {
-        verseElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        verseElement.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }, 100);
   };
