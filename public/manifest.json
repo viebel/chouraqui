@@ -1,0 +1,21 @@
+{
+  "name": "La Bible Chouraqui",
+  "short_name": "Chouraqui",
+  "description": "Affichage de la Bible en hébreu et en français avec les traductions d'André Chouraqui.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF5EF",
+  "theme_color": "#A0522D",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
